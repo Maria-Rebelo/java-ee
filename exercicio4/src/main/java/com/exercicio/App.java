@@ -58,9 +58,9 @@ public class App
                         .build();
                         
                         HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
-                        JsonNode jsonNode2 = mapper.readTree(response.body());
+                        JsonNode jsonNode2 = mapper.readTree(response2.body());
                 
-                        String nameEp = jsonNode.get("name").asText();
+                        String nameEp = jsonNode2.get("name").asText();
                         System.out.println( "[ALERTA FORENSE] O último registo do alien morto foi no episódio: "+nameEp);
                     } 
                 } else {
