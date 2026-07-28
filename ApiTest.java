@@ -21,7 +21,6 @@ public class ApiTest {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
            
             String[] resposta = response.body().split(",");
-            System.out.println(resposta[1]);
             if (resposta[2].contains("Alive")) {
                 contVivos++;
             } else if (resposta[2].contains("Dead")) {
