@@ -91,10 +91,12 @@ public class App extends HttpServlet
                 
                 try {
                     HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    
+                    //Thread.sleep(1000);
+ 
                     JsonNode jsonNode = mapper.readTree(response.body());
                     
                     String status = jsonNode.get("status").asText();
+                    
                     
                     if (status.equals("Alive")) {
                         contVivos++;
@@ -131,6 +133,7 @@ public class App extends HttpServlet
                 
                 } catch (Exception e) {
                     System.out.println( "Erro a ler String json"+i);
+                    //i--;
                 }
             
                 
