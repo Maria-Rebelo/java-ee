@@ -1,0 +1,5 @@
+127.0.0.1 - - [31/Jul/2026:11:39:51 +0100] "GET /api/census?showAlert=8&offset=9.2 HTTP/1.1" 200 149
+127.0.0.1 - - [31/Jul/2026:11:40:15 +0100] "GET /api/census?showAlert=false&offset=9.2 HTTP/1.1" 200 146
+127.0.0.1 - - [31/Jul/2026:11:40:23 +0100] "GET /api/census?showAlert=false&offset=9 HTTP/1.1" 200 127
+127.0.0.1 - - [31/Jul/2026:11:41:30 +0100] "GET /api/census?showAlert=false&offset=0 HTTP/1.1" 200 127
+127.0.0.1 - - [31/Jul/2026:11:41:42 +0100] "GET /api/census?showAlert=false&limit=0 HTTP/1.1" 200 158

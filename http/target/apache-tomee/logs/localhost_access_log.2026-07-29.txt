@@ -1,7 +1,0 @@
-127.0.0.1 - - [29/Jul/2026:15:43:11 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 965
-127.0.0.1 - - [29/Jul/2026:15:43:44 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 964
-0:0:0:0:0:0:0:1 - - [29/Jul/2026:15:43:51 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 757
-0:0:0:0:0:0:0:1 - - [29/Jul/2026:15:45:55 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 965
-127.0.0.1 - - [29/Jul/2026:15:46:12 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 965
-0:0:0:0:0:0:0:1 - - [29/Jul/2026:15:47:39 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 965
-0:0:0:0:0:0:0:1 - - [29/Jul/2026:15:51:03 +0100] "GET /census?limit=50&offset=1 HTTP/1.1" 200 965

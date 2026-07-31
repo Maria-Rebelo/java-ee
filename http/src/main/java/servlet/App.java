@@ -8,20 +8,17 @@ import java.net.http.HttpResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 
 
-@WebServlet("/census")
-public class App extends HttpServlet
+@Path("/census")
+public class App 
 {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException 
+    @GET
+    public String doGet(@DefaultValue("1")@QueryParam("offset") String offset,@DefaultValue("20")@QueryParam("limit") String limit, @DefaultValue("true")@QueryParam("showAlert") String showAlert) 
     {
         ObjectMapper mapper = new ObjectMapper();
         
@@ -32,56 +29,53 @@ public class App extends HttpServlet
         int contVivos=0;
         int contMortos=0;
         int contDesc=0;
-        int x=1;
-        int y=20;
-        Boolean alert=true;
-        String offset = req.getParameter("offset");
-        String limit = req.getParameter("limit");
-        String showAlert = req.getParameter("showAlert");
+        int x=0;
+        int y=0;
+        Boolean alert=null;
         Boolean erroSintaxe = false;
         String msg="";
+        String resposta ="--------------------\n";
 
-        if (offset!=null)
-        {
-            if (isNumeric(offset)){
+       
+        if (isNumeric(offset)){
+             if (Integer.parseInt(limit)>0 && Integer.parseInt(limit)<=50) {
                 x=Integer.parseInt(offset);
-            }
-            else{
+             } else {
                 erroSintaxe=true;
-                msg="O parametro offset tem de ser um numero inteiro";
+                msg="O parametro offset tem de ser um numero inteiro entre 1 e 50";
             }
         }
-
-        if (limit!=null)
-        {
-            if (isNumeric(limit)){
-                if (Integer.parseInt(limit)>0 && Integer.parseInt(limit)<=50) {
-                    y=Integer.parseInt(limit);                    
-                } else {
-                    erroSintaxe=true;
-                    msg="O parametro limit tem de ser um numero inteiro entre 1 e 50";
-                }
-            }
-            else{
+        else{
+            erroSintaxe=true;
+            msg="O parametro offset tem de ser um numero inteiro";
+        }
+        
+        if (isNumeric(limit)){
+            if (Integer.parseInt(limit)>0 && Integer.parseInt(limit)<=50) {
+                y=Integer.parseInt(limit);                    
+            } else {
                 erroSintaxe=true;
-                msg="O parametro limit tem de ser um numero inteiro";
+                msg="O parametro limit tem de ser um numero inteiro entre 1 e 50";
             }
         }
-        if (showAlert!=null)
-        {
-            if (showAlert.contentEquals("true") || showAlert.contentEquals("false")){
-                alert=Boolean.parseBoolean(showAlert);
-            }
-            else{
-                erroSintaxe=true;
-                msg="O parametro showAlert tem de ser \"false\" ou \"true\"";
-            }
+        else{
+            erroSintaxe=true;
+            msg="O parametro limit tem de ser um numero inteiro";
+        }
+        
+        
+        if (showAlert.contentEquals("true") || showAlert.contentEquals("false")){
+            alert=Boolean.parseBoolean(showAlert);
+        }
+        else{
+            erroSintaxe=true;
+            msg="O parametro showAlert tem de ser \"false\" ou \"true\"";
         }
           
        
         if (!erroSintaxe)
         {
-            for(int i = x; i <= y; i++){
+            for(int i = x; i < x+y; i++){
                 urlPedido=urlBase + i;
                 HttpRequest request=HttpRequest.newBuilder()
                 .uri(URI.create(urlPedido))
@@ -107,9 +101,8 @@ public class App extends HttpServlet
                         String species = jsonNode.get("species").asText();
         
                         if (species.equals("Alien") && alert) {
-                            resp.getWriter().write("--------------------\n");
-                            resp.getWriter().write("Um Alien foi encontrado morto com o ID "+i+"!\n");
-                            resp.getWriter().write("--------------------\n");
+                            resposta += "Um Alien foi encontrado morto com o ID "+i+"!\n" + //
+                            "--------------------\n";
 
                             JsonNode arrayEpisode = jsonNode.get("episode");
                             String urlNovo= arrayEpisode.get(arrayEpisode.size()-1).asText();
@@ -123,9 +116,8 @@ public class App extends HttpServlet
                             jsonNode = mapper.readTree(response.body());
                     
                             String nameEp = jsonNode.get("name").asText();
-                            resp.getWriter().write("--------------------\n");
-                            resp.getWriter().write( "[ALERTA FORENSE] O ultimo registo do alien morto foi no episodio: "+nameEp+"\n");
-                            resp.getWriter().write("--------------------\n");
+                            resposta +="[ALERTA FORENSE] O ultimo registo do alien morto foi no episodio: "+nameEp+"\n" +//
+                            "--------------------\n";
                         } 
                     } else {
                         contDesc++;
@@ -138,21 +130,19 @@ public class App extends HttpServlet
             
                 
             }
-            resp.getWriter().write("--------------------\n");
-            resp.getWriter().write("Detetados "+contVivos+" personagens VIVOS e "+contMortos+" personagens MORTOS e "+contDesc+" com paredeiro desconhecido.\n");
-            resp.getWriter().write("--------------------\n");
+            resposta+="Detetados "+contVivos+" personagens VIVOS e "+contMortos+" personagens MORTOS e "+contDesc+" com paredeiro desconhecido.\n" + //
+           "--------------------\n";
         }
         else
         {
-            String jsonString = " \"status\": 400,\n" + //
+            resposta += " \"status\": 400,\n" + //
                                 "  \"error\": \"Bad Request\",\n" + //
-                                "  \"message\": \""+msg+"\n";
-            resp.setStatus(400);
-            resp.getWriter().write("--------------------\n");
-            resp.getWriter().write(jsonString);
-            resp.getWriter().write("--------------------\n");
+                                "  \"message\": \""+msg+"\n" + //
+                                "--------------------\n";
+            //resp.setStatus(400);
+            
         }
-
+        return resposta;
     }
 
 
