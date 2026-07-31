@@ -12,14 +12,19 @@ import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
+
 
 
 @Path("/census")
 public class App 
 {
     @GET
-    public String doGet(@DefaultValue("1")@QueryParam("offset") String offset,@DefaultValue("20")@QueryParam("limit") String limit, @DefaultValue("true")@QueryParam("showAlert") String showAlert) 
+    public Response doGet(@DefaultValue("1")@QueryParam("offset") String offset,@DefaultValue("20")@QueryParam("limit") String limit, @DefaultValue("true")@QueryParam("showAlert") String showAlert) 
     {
+        Response.ResponseBuilder responseBuilder = Response.ok();
+        
+
         ObjectMapper mapper = new ObjectMapper();
         
         HttpClient client=HttpClient.newHttpClient();
@@ -34,7 +39,7 @@ public class App
         Boolean alert=null;
         Boolean erroSintaxe = false;
         String msg="";
-        String resposta ="--------------------\n";
+        String respostaString ="--------------------\n";
 
        
         if (isNumeric(offset)){
@@ -101,7 +106,7 @@ public class App
                         String species = jsonNode.get("species").asText();
         
                         if (species.equals("Alien") && alert) {
-                            resposta += "Um Alien foi encontrado morto com o ID "+i+"!\n" + //
+                            respostaString += "Um Alien foi encontrado morto com o ID "+i+"!\n" + //
                             "--------------------\n";
 
                             JsonNode arrayEpisode = jsonNode.get("episode");
@@ -116,7 +121,7 @@ public class App
                             jsonNode = mapper.readTree(response.body());
                     
                             String nameEp = jsonNode.get("name").asText();
-                            resposta +="[ALERTA FORENSE] O ultimo registo do alien morto foi no episodio: "+nameEp+"\n" +//
+                            respostaString +="[ALERTA FORENSE] O ultimo registo do alien morto foi no episodio: "+nameEp+"\n" +//
                             "--------------------\n";
                         } 
                     } else {
@@ -130,18 +135,25 @@ public class App
             
                 
             }
-            resposta+="Detetados "+contVivos+" personagens VIVOS e "+contMortos+" personagens MORTOS e "+contDesc+" com paredeiro desconhecido.\n" + //
+            
+            respostaString +="Detetados "+contVivos+" personagens VIVOS e "+contMortos+" personagens MORTOS e "+contDesc+" com paredeiro desconhecido.\n" + //
            "--------------------\n";
+            
+            responseBuilder.entity(respostaString);
         }
         else
         {
-            resposta += " \"status\": 400,\n" + //
+            respostaString += " \"status\": 400,\n" + //
                                 "  \"error\": \"Bad Request\",\n" + //
                                 "  \"message\": \""+msg+"\n" + //
                                 "--------------------\n";
-            //resp.setStatus(400);
+            
+            responseBuilder.status(400);
+            responseBuilder.entity(respostaString);
+            
             
         }
+        Response resposta = responseBuilder.build();
         return resposta;
     }
 
